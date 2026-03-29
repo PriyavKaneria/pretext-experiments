@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Echoes of Fleeting Light — A lingering shadow of the ten-year journey that forever changed how I see the sky.">
+  <title>Echoes of Fleeting Light — Diginova Experiments</title>
+  <link rel="stylesheet" href="../styles/site.css">
+  <style>
+    :root {
+      color-scheme: light;
+      --sky-top: #7386a9;
+      --sky-mid: #dce2eb;
+      --sky-bottom: #f7f2e8;
+      --ink: #433127;
+      --rule: rgba(121, 95, 70, 0.22);
+      --accent: #a0734a;
+      --sun: #e3b25d;
+      --moon: #d8dfeb;
+      --orb-outline: rgba(112, 88, 64, 0.42);
+      --village-opacity: 0.9;
+      --village-height: clamp(150px, 19vw, 236px);
+      --wash-opacity: 0.88;
+      --wash-brightness: 1;
+      --wash-saturation: 1;
+      --grain-opacity: 0.12;
+      --village-filter: saturate(0.84) brightness(0.95);
+      --star-opacity: 0;
+      --star-twinkle: 0.32;
+      --cloud-opacity: 0.4;
+      --sky-glow-x: 50%;
+      --sky-glow-y: 70%;
+      --sky-horizon-glow: rgba(255, 194, 120, 0.24);
+      --sky-zenith-glow: rgba(255, 233, 196, 0.12);
+      --type-scale: 0.8;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background-color: var(--sky-bottom);
+      background:
+        radial-gradient(circle at var(--sky-glow-x) var(--sky-glow-y), var(--sky-horizon-glow) 0%, transparent 34%),
+        radial-gradient(circle at 50% 8%, var(--sky-zenith-glow) 0%, transparent 44%),
+        linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 30%, var(--sky-bottom) 76%);
+      color: var(--ink);
+      transition: background 1600ms ease, background-color 1600ms ease, color 1200ms ease;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .clouds,
+    .sky-wash,
+    .sky-grain,
+    .starfield {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .clouds {
+      overflow: hidden;
+      opacity: var(--cloud-opacity);
+      transition: opacity 2200ms ease;
+    }
+
+    .clouds-1,
+    .clouds-2,
+    .clouds-3 {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      height: 500px;
+      background-repeat: repeat-x;
+      background-position: 0 0;
+      background-size: auto 100%;
+      will-change: background-position;
+    }
+
+    .clouds-1 {
+      background-image: url("../assets/clouds_2.png");
+      animation: clouds-loop-1 20s linear infinite;
+    }
+
+    .clouds-2 {
+      background-image: url("../assets/clouds_1.png");
+      animation: clouds-loop-2 15s linear infinite;
+    }
+
+    .clouds-3 {
+      background-image: url("../assets/clouds_3.png");
+      animation: clouds-loop-3 17s linear infinite;
+    }
+
+    @keyframes clouds-loop-1 {
+      to {
+        background-position: -1000px 0;
+      }
+    }
+
+    @keyframes clouds-loop-2 {
+      to {
+        background-position: -1000px 0;
+      }
+    }
+
+    @keyframes clouds-loop-3 {
+      to {
+        background-position: -1579px 0;
+      }
+    }
+
+    .starfield {
+      opacity: var(--star-opacity);
+      background:
+        radial-gradient(circle at 8% 22%, rgba(255,255,255,var(--star-twinkle)) 0 1px, transparent 1.6px),
+        radial-gradient(circle at 17% 10%, rgba(255,255,255,0.72) 0 1.3px, transparent 1.9px),
+        radial-gradient(circle at 26% 28%, rgba(255,255,255,0.52) 0 0.9px, transparent 1.6px),
+        radial-gradient(circle at 34% 14%, rgba(255,255,255,0.78) 0 1.1px, transparent 1.7px),
+        radial-gradient(circle at 42% 24%, rgba(255,255,255,0.56) 0 0.9px, transparent 1.5px),
+        radial-gradient(circle at 54% 12%, rgba(255,255,255,0.84) 0 1.2px, transparent 1.8px),
+        radial-gradient(circle at 62% 30%, rgba(255,255,255,0.58) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 73% 16%, rgba(255,255,255,0.74) 0 1.1px, transparent 1.7px),
+        radial-gradient(circle at 81% 26%, rgba(255,255,255,0.48) 0 0.9px, transparent 1.6px),
+        radial-gradient(circle at 90% 12%, rgba(255,255,255,0.8) 0 1.2px, transparent 1.8px);
+      transition: opacity 2200ms ease;
+    }
+
+    .sky-wash {
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.32), transparent 24%),
+        radial-gradient(circle at 78% 14%, rgba(255, 235, 198, 0.28), transparent 26%),
+        radial-gradient(circle at 52% 82%, rgba(255, 255, 255, 0.16), transparent 30%);
+      opacity: var(--wash-opacity);
+      filter: saturate(var(--wash-saturation)) brightness(var(--wash-brightness));
+      transition: opacity 1600ms ease, filter 1600ms ease;
+    }
+
+    .sky-grain {
+      opacity: var(--grain-opacity);
+      background-image:
+        linear-gradient(rgba(255,255,255,0.06), rgba(255,255,255,0.06)),
+        linear-gradient(90deg, transparent 0, rgba(255,255,255,0.12) 50%, transparent 100%);
+      mix-blend-mode: screen;
+      transition: opacity 1600ms ease;
+    }
+
+    .back-link {
+      position: absolute;
+      left: clamp(20px, 5vw, 62px);
+      top: clamp(14px, 2.5vw, 28px);
+      z-index: 5;
+      font: 500 calc(11px * var(--type-scale))/1 "SF Mono", "Fira Code", monospace;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ink) 64%, transparent);
+      text-decoration: none;
+      transition: color 1200ms ease;
+    }
+
+    .masthead {
+      position: absolute;
+      left: clamp(20px, 5vw, 62px);
+      top: clamp(54px, 8vh, 82px);
+      width: min(560px, calc(100vw - 190px));
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .kicker {
+      margin-bottom: 12px;
+      font: 500 calc(11px * var(--type-scale))/1 "SF Mono", "Fira Code", monospace;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ink) 56%, transparent);
+      transition: color 1200ms ease;
+    }
+
+    .title {
+      margin: 0 0 10px;
+      font: 500 clamp(calc(34px * var(--type-scale)), calc(4.8vw * var(--type-scale)), calc(76px * var(--type-scale)))/0.95 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      letter-spacing: -1.2px;
+      text-wrap: balance;
+      margin-top: 50px;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 1500px;
+      font: 400 clamp(calc(14px * var(--type-scale)), calc(1.25vw * var(--type-scale)), calc(17px * var(--type-scale)))/1.68 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      color: color-mix(in srgb, var(--ink) 72%, transparent);
+      text-wrap: balance;
+      transition: color 1200ms ease;
+    }
+
+    .settings {
+      position: absolute;
+      top: clamp(16px, 2.4vw, 26px);
+      right: clamp(14px, 2.5vw, 30px);
+      z-index: 6;
+      display: grid;
+      gap: 8px;
+      width: min(310px, calc(100vw - 30px));
+      padding: 0;
+      background: transparent;
+      border: 0;
+      backdrop-filter: none;
+      box-shadow: none;
+      text-align: right;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .settings-label {
+      min-width: 52px;
+      font: 500 calc(11px * var(--type-scale))/1 "SF Mono", "Fira Code", monospace;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--ink) 56%, transparent);
+      transition: color 1200ms ease;
+    }
+
+    .settings-value {
+      min-width: 48px;
+      font: 500 calc(12px * var(--type-scale))/1 "SF Mono", "Fira Code", monospace;
+      color: var(--accent);
+    }
+
+    .settings input[type="range"] {
+      flex: 1 1 110px;
+      min-width: 80px;
+      accent-color: var(--accent);
+    }
+
+    .settings button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      font: 400 calc(14px * var(--type-scale))/1.2 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      border-bottom: 1px solid transparent;
+      cursor: pointer;
+      transition: color 1200ms ease, border-color 1200ms ease;
+    }
+
+    .settings button:hover {
+      color: var(--accent);
+      border-color: currentColor;
+    }
+
+    .plain-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font: 400 calc(14px * var(--type-scale))/1.3 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      color: var(--ink);
+      transition: color 1200ms ease;
+    }
+
+    .plain-toggle input {
+      accent-color: var(--accent);
+    }
+
+    .status {
+      font: 400 calc(12px * var(--type-scale))/1.5 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      color: color-mix(in srgb, var(--ink) 72%, transparent);
+      max-width: 310px;
+      margin-left: auto;
+      white-space: nowrap;
+      transition: color 1200ms ease;
+    }
+
+    .story-field {
+      position: absolute;
+      inset: 0;
+      padding:
+        var(--story-top, clamp(220px, 34vh, 320px))
+        clamp(10px, 2.5vw, 62px)
+        calc(var(--village-height) + 34px)
+        clamp(10px, 2.5vw, 62px);
+    }
+
+    .line-layer {
+      position: absolute;
+      inset: 0;
+      contain: layout paint style;
+    }
+
+    .line {
+      position: absolute;
+      left: 0;
+      top: 0;
+      white-space: pre;
+      color: var(--ink);
+      transform: translate3d(var(--x), var(--y), 0);
+      font-family: Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-size: var(--font-size, 22px);
+      line-height: var(--line-height, 33px);
+      letter-spacing: -0.012em;
+      text-rendering: geometricPrecision;
+      user-select: none;
+      transition: transform 80ms linear, color 1200ms ease;
+      max-width: min(76ch, calc(100vw - 64px));
+    }
+
+    .orb {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: translate3d(calc(var(--orb-x) - 50%), calc(var(--orb-y) - 50%), 0);
+      will-change: transform;
+      overflow: visible;
+      transition: opacity 900ms ease, filter 1200ms ease;
+    }
+
+    .orb::before {
+      content: "";
+      position: absolute;
+      inset: -22%;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      pointer-events: none;
+    }
+
+    .orb--sun::before {
+      width: var(--sun-size);
+      height: var(--sun-size);
+      inset: -32%;
+      padding: 150px;
+      margin: -150px;
+      background-image: url("../assets/sun.png");
+      background-size: 70%;
+      background-position: center;
+      filter:
+        saturate(1.08)
+        drop-shadow(0 0 18px rgba(255, 237, 173, 0.82))
+        drop-shadow(0 0 44px rgba(246, 189, 79, 0.7))
+        drop-shadow(0 0 90px rgba(239, 177, 51, 0.38));
+    }
+
+    .orb--sun {
+      width: var(--sun-size);
+      height: var(--sun-size);
+    }
+
+    .orb--moon::before {
+      width: var(--moon-size);
+      height: var(--moon-size);
+      inset: -20%;
+      background-image: url("../assets/moon.png");
+      filter:
+        contrast(1.04)
+        saturate(0.94)
+        drop-shadow(0 0 18px color-mix(in srgb, var(--moon) 32%, transparent))
+        drop-shadow(0 0 42px color-mix(in srgb, var(--moon) 16%, transparent));
+    }
+
+    .orb--moon {
+      width: var(--moon-size);
+      height: var(--moon-size);
+    }
+
+    .village-strip {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -5px;
+      height: var(--village-height);
+      width: 100vw;
+      pointer-events: none;
+    }
+
+    .village-strip img {
+      position: absolute;
+      left: 0;
+      bottom: -30px;
+      width: 100vw;
+      max-width: none;
+      opacity: var(--village-opacity);
+      display: block;
+      transition: opacity 1600ms ease, filter 1600ms ease;
+      filter: var(--village-filter);
+    }
+
+    @media (max-width: 820px) {
+      .masthead {
+        width: min(560px, calc(100vw - 34px));
+        top: 82px;
+      }
+
+      .settings {
+        width: min(300px, calc(100vw - 24px));
+      }
+
+      .story-field {
+        padding-top: clamp(228px, 33vh, 320px);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .settings {
+        top: auto;
+        bottom: calc(var(--village-height) + 12px);
+        right: 12px;
+        left: 12px;
+        width: auto;
+      }
+
+      .masthead {
+        top: 62px;
+        width: calc(100vw - 24px);
+      }
+
+      .story-field {
+        padding:
+          clamp(188px, 28vh, 250px)
+          16px
+          calc(var(--village-height) + 120px)
+          16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="viewport">
+    <div class="starfield"></div>
+    <div class="clouds" aria-hidden="true">
+      <div class="clouds-1"></div>
+      <div class="clouds-2"></div>
+      <div class="clouds-3"></div>
+    </div>
+    <div class="sky-wash"></div>
+    <div class="sky-grain"></div>
+
+    <a class="back-link" href="../index.html">← Back</a>
+
+    <header class="masthead" id="masthead">
+      <div class="kicker">Experiment 02</div>
+      <h1 class="title">Echoes of Fleeting Light</h1>
+      <p class="subtitle">A lingering shadow of the ten-year journey that forever changed how I see the sky.</p>
+    </header>
+
+    <aside class="settings" id="settingsPanel" aria-label="Settings">
+      <div class="settings-row">
+        <span class="settings-label">Type</span>
+        <span class="settings-value" id="fontSizeValue">21 px</span>
+        <input id="fontSize" type="range" min="14" max="24" step="1" value="21">
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Leading</span>
+        <span class="settings-value" id="lineHeightValue">31 px</span>
+        <input id="lineHeight" type="range" min="21" max="34" step="1" value="31">
+      </div>
+      <div class="settings-row">
+        <button id="resetOrbit" type="button">Reset</button>
+      </div>
+      <div class="status"><span id="statPhase">Dawn</span> · <span id="statTheme">0%</span> · <span id="statLines">0</span> lines</div>
+    </aside>
+
+    <section class="story-field" id="scene" aria-label="Echoes of Fleeting Light interactive page">
+      <div class="line-layer" id="lineLayer"></div>
+      <div class="orb orb--sun" id="sunOrb" aria-hidden="true"></div>
+      <div class="orb orb--moon" id="moonOrb" aria-hidden="true"></div>
+    </section>
+
+    <div class="village-strip" aria-hidden="true">
+      <img id="villageImage" src="../assets/village_only.png" alt="">
+    </div>
+  </main>
+
+  <script type="module" src="./echoes-of-fleeting-light.js"></script>
+</body>
+</html>
