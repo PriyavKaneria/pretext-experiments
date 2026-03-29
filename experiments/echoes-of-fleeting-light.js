@@ -33,6 +33,9 @@ const scene = document.getElementById("scene");
 const masthead = document.getElementById("masthead");
 const settingsPanel = document.getElementById("settingsPanel");
 const lineLayer = document.getElementById("lineLayer");
+const mobileStory = document.getElementById("mobileStory");
+const mobileNote = document.getElementById("mobileNote");
+const mobileNoteDismiss = document.getElementById("mobileNoteDismiss");
 const sunOrb = document.getElementById("sunOrb");
 const moonOrb = document.getElementById("moonOrb");
 const villageImage = document.getElementById("villageImage");
@@ -47,6 +50,7 @@ const resetOrbitButton = document.getElementById("resetOrbit");
 
 const preparedCache = new Map();
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const mobileFallbackQuery = window.matchMedia("(max-width: 820px)");
 const ORBIT_SPEED = 0.00014;
 const RELAYOUT_INTERVAL = 1000 / 48;
 const RELAYOUT_DISTANCE = 1.6;
@@ -69,6 +73,8 @@ const state = {
   lineNodes: [],
   villageMaskProfile: null,
   villageContour: null,
+  mobileNoticeDismissed: false,
+  mobileStoryKey: "",
   lastLayoutBodies: null,
   lastLayoutTime: 0,
   sun: { x: 0, y: 0, radius: SUN_SIZE * 0.5, visible: true, progress: 0 },
@@ -145,6 +151,31 @@ function storyBlocks(text) {
   }
 
   return blocks.length ? blocks : [{ text: "", gapBefore: 0 }];
+}
+
+function isMobileFallback() {
+  return mobileFallbackQuery.matches;
+}
+
+function syncMobileMode() {
+  root.classList.toggle("mobile-fallback", isMobileFallback());
+  mobileNote.hidden = !isMobileFallback() || state.mobileNoticeDismissed;
+}
+
+function renderMobileStory() {
+  const key = `${state.text}::${state.fontSize}::${state.lineHeight}`;
+  if (state.mobileStoryKey === key) return;
+  state.mobileStoryKey = key;
+
+  mobileStory.innerHTML = "";
+  for (const block of storyBlocks(state.text)) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = block.text;
+    if (block.gapBefore > 0) {
+      paragraph.style.marginTop = `${round(block.gapBefore * state.lineHeight * 0.68)}px`;
+    }
+    mobileStory.appendChild(paragraph);
+  }
 }
 
 function ensureVillageMaskProfile() {
@@ -617,6 +648,20 @@ function render(force = false) {
   applyTheme(blend, state.sun, state.moon, metrics);
   statPhase.textContent = phaseLabel(blend);
 
+  if (isMobileFallback()) {
+    syncLineNodes(0);
+    renderMobileStory();
+    statLines.textContent = String(storyBlocks(state.text).length);
+    state.layoutKey = "mobile";
+    state.lastLayoutBodies = {
+      sunX: state.sun.x,
+      sunY: state.sun.y,
+      moonX: state.moon.x,
+      moonY: state.moon.y
+    };
+    return;
+  }
+
   const key = layoutSignature(metrics, layoutState.obstacles);
   if (!force && key === state.layoutKey) return;
   state.layoutKey = key;
@@ -632,9 +677,11 @@ function render(force = false) {
 }
 
 function requestRender() {
+  syncMobileMode();
   measureTopClearance();
   measureVillageContour();
   state.layoutKey = "";
+  state.mobileStoryKey = "";
   render(true);
 }
 
@@ -696,8 +743,13 @@ lineHeightInput.addEventListener("input", () => {
 });
 
 resetOrbitButton.addEventListener("click", resetOrbit);
+mobileNoteDismiss.addEventListener("click", () => {
+  state.mobileNoticeDismissed = true;
+  syncMobileMode();
+});
 
 window.addEventListener("resize", requestRender);
+mobileFallbackQuery.addEventListener("change", requestRender);
 prefersReducedMotion.addEventListener("change", requestRender);
 villageImage?.addEventListener("load", requestRender);
 

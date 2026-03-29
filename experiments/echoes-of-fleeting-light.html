@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="description" content="Echoes of Fleeting Light — A lingering shadow of the ten-year journey that forever changed how I see the sky.">
   <title>Echoes of Fleeting Light — Diginova Experiments</title>
   <link rel="stylesheet" href="../styles/site.css">
@@ -295,6 +295,7 @@
     .story-field {
       position: absolute;
       inset: 0;
+      overflow: hidden;
       padding:
         var(--story-top, clamp(220px, 34vh, 320px))
         clamp(10px, 2.5vw, 62px)
@@ -306,6 +307,7 @@
       position: absolute;
       inset: 0;
       contain: layout paint style;
+      z-index: 2;
     }
 
     .line {
@@ -332,6 +334,7 @@
       transform: translate3d(calc(var(--orb-x) - 50%), calc(var(--orb-y) - 50%), 0);
       will-change: transform;
       overflow: visible;
+      z-index: 1;
       transition: opacity 900ms ease, filter 1200ms ease;
     }
 
@@ -381,6 +384,68 @@
     .orb--moon {
       width: var(--moon-size);
       height: var(--moon-size);
+    }
+
+    .mobile-story {
+      display: none;
+      position: relative;
+      z-index: 3;
+      max-width: min(72ch, calc(100vw - 28px));
+      margin: 0;
+      color: var(--ink);
+      font: 400 16px/1.72 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      letter-spacing: -0.01em;
+      text-wrap: pretty;
+    }
+
+    .mobile-story p {
+      margin: 0 0 1em;
+    }
+
+    .mobile-note {
+      display: none;
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: calc(var(--village-height) + 12px);
+      z-index: 8;
+      padding: 12px 14px;
+      border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+      background: color-mix(in srgb, var(--sky-bottom) 78%, white 22%);
+      color: var(--ink);
+      font: 400 13px/1.45 Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      box-shadow: 0 14px 32px rgba(25, 20, 12, 0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .mobile-note button {
+      margin-top: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 0.14em;
+    }
+
+    html.mobile-fallback .line-layer {
+      display: none;
+    }
+
+    html.mobile-fallback .mobile-story {
+      display: block;
+    }
+
+    html.mobile-fallback .story-field {
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    html.mobile-fallback .mobile-note {
+      display: block;
     }
 
     .village-strip {
@@ -441,6 +506,12 @@
           calc(var(--village-height) + 120px)
           16px;
       }
+
+      .mobile-story {
+        max-width: none;
+        font-size: 15px;
+        line-height: 1.7;
+      }
     }
   </style>
 </head>
@@ -480,8 +551,14 @@
       <div class="status"><span id="statPhase">Dawn</span> · <span id="statTheme">0%</span> · <span id="statLines">0</span> lines</div>
     </aside>
 
+    <aside class="mobile-note" id="mobileNote" aria-live="polite">
+      This experience works best on desktop. On mobile, a simplified text mode is shown while the sun and moon continue behind the story.
+      <button id="mobileNoteDismiss" type="button">Dismiss</button>
+    </aside>
+
     <section class="story-field" id="scene" aria-label="Echoes of Fleeting Light interactive page">
       <div class="line-layer" id="lineLayer"></div>
+      <div class="mobile-story" id="mobileStory"></div>
       <div class="orb orb--sun" id="sunOrb" aria-hidden="true"></div>
       <div class="orb orb--moon" id="moonOrb" aria-hidden="true"></div>
     </section>
