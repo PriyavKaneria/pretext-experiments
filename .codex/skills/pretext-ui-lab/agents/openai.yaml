@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pretext Lab"
+  short_description: "UI/UX experiments with Pretext"
+  default_prompt: "Use $pretext-ui-lab to prototype an experimental text layout or interaction with the pretext library in this workspace."

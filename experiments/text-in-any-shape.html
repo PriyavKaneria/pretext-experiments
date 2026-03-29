@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A multi-shape typography studio where each closed figure owns its own text.">
+  <title>Text-in-Any-Shape Studio — Diginova Experiments</title>
+  <link rel="stylesheet" href="../styles/site.css">
+  <style>
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(196,163,90,0.38) rgba(255,255,255,0.04);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.04);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(196,163,90,0.42), rgba(91,168,255,0.34));
+      border-radius: 999px;
+      border: 2px solid rgba(8,8,14,0.92);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(196,163,90,0.56), rgba(91,168,255,0.46));
+    }
+
+    .back-link {
+      margin-bottom: 14px;
+    }
+
+    .experiment-shell {
+      height: 100vh;
+      padding: 16px 18px 18px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+    }
+
+    .experiment-header {
+      margin: 0 auto 14px;
+      max-width: 860px;
+    }
+
+    .experiment-title {
+      margin-bottom: 6px;
+    }
+
+    .workspace {
+      width: min(1380px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .panel {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.015);
+      overflow: hidden;
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .panel::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .panel::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(196,163,90,0.48), rgba(91,168,255,0.38));
+      border: 2px solid rgba(14,14,20,0.95);
+    }
+
+    .panel-section {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .panel-section:first-child {
+      border-top: 0;
+    }
+
+    .panel-label {
+      display: block;
+      margin-bottom: 10px;
+      font: 500 11px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .shape-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .shape-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .shape-chip.active {
+      border-color: rgba(91,168,255,0.28);
+      background: rgba(91,168,255,0.10);
+      color: rgba(255,255,255,0.92);
+    }
+
+    .shape-chip-title {
+      font: 500 13px/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .shape-chip-main {
+      min-width: 0;
+      flex: 1 1 auto;
+      text-align: left;
+    }
+
+    .shape-chip-meta {
+      font: 400 11px/1 "SF Mono", "Fira Code", monospace;
+      color: rgba(255,255,255,0.28);
+    }
+
+    .shape-chip.active .shape-chip-meta {
+      color: rgba(100,200,255,0.82);
+    }
+
+    .shape-chip-delete {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.46);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: all 0.15s ease;
+    }
+
+    .shape-chip-delete:hover {
+      background: rgba(196,90,90,0.16);
+      border-color: rgba(196,90,90,0.24);
+      color: rgba(255,255,255,0.88);
+    }
+
+    .button-row,
+    .shape-templates,
+    .mini-row,
+    .range-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .button-row,
+    .shape-templates {
+      margin-top: 10px;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .tool-btn,
+    .shape-btn,
+    .sample-btn {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.56);
+      font: 500 11px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tool-btn:hover,
+    .shape-btn:hover,
+    .sample-btn:hover {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.74);
+    }
+
+    .shape-btn.active,
+    .sample-btn.active,
+    .tool-btn.is-active {
+      background: rgba(91,168,255,0.12);
+      border-color: rgba(91,168,255,0.3);
+      color: rgba(91,168,255,0.86);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      color: rgba(255,255,255,0.62);
+      font: 400 12px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      accent-color: #5ba8ff;
+    }
+
+    .editor,
+    .svg-paste {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.88);
+      resize: vertical;
+      outline: none;
+      font: 400 14px/1.65 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .editor:focus,
+    .svg-paste:focus,
+    .font-input:focus,
+    .font-select:focus {
+      border-color: rgba(91,168,255,0.28);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .hint-text {
+      margin-top: 10px;
+      color: rgba(255,255,255,0.28);
+      font: 400 12px/1.55 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .font-select,
+    .font-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.86);
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .font-file {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px;
+      height: 1px;
+    }
+
+    .range-group {
+      flex: 1 1 120px;
+    }
+
+    .range-group input[type="range"] {
+      width: 100%;
+      accent-color: #5ba8ff;
+      margin-top: 8px;
+    }
+
+    .value-display {
+      display: inline-block;
+      margin-top: 8px;
+      font: 500 12px/1 "SF Mono", "Fira Code", monospace;
+      color: rgba(100,200,255,0.8);
+    }
+
+    .stage-shell {
+      position: relative;
+      position: sticky;
+      top: 18px;
+      align-self: start;
+      min-height: 0;
+      height: 100%;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .stage {
+      position: relative;
+      height: 100%;
+      min-height: 0;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      background:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+        radial-gradient(circle at 50% 14%, rgba(196,163,90,0.06), transparent 24%),
+        rgba(255,255,255,0.015);
+      background-size: 40px 40px, 40px 40px, auto, auto;
+      background-position: var(--grid-x, 0px) var(--grid-y, 0px), var(--grid-x, 0px) var(--grid-y, 0px), center top, center;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+    }
+
+    .stage.is-panning {
+      cursor: grabbing;
+    }
+
+    .status {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.45);
+      color: rgba(255,255,255,0.24);
+      font: 400 13px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .scene-svg,
+    .helper-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .helper-svg {
+      left: -99999px;
+      top: -99999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .shape-path {
+      fill: rgba(255,255,255,0.018);
+      stroke: rgba(255,255,255,0.08);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+      cursor: move;
+    }
+
+    .shape-path.active {
+      stroke: rgba(91,168,255,0.45);
+      fill: rgba(91,168,255,0.06);
+    }
+
+    .shape-path.hidden-guide {
+      fill: none;
+      stroke: rgba(255,255,255,0.18);
+      stroke-dasharray: 6 7;
+    }
+
+    .bbox {
+      fill: none;
+      stroke: rgba(91,168,255,0.34);
+      stroke-width: 1;
+      stroke-dasharray: 8 6;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+    }
+
+    .shape-text {
+      fill: #e8e4dc;
+      pointer-events: none;
+    }
+
+    .vertex,
+    .midpoint,
+    .transform-handle {
+      cursor: pointer;
+    }
+
+    .vertex {
+      fill: rgba(91,168,255,0.9);
+      stroke: rgba(8,8,14,0.9);
+      stroke-width: 1.5;
+    }
+
+    .midpoint {
+      fill: rgba(196,163,90,0.92);
+      stroke: rgba(8,8,14,0.9);
+      stroke-width: 1.5;
+    }
+
+    .transform-handle.scale {
+      fill: rgba(120,200,120,0.92);
+      stroke: rgba(8,8,14,0.9);
+      stroke-width: 1.5;
+    }
+
+    .transform-handle.rotate {
+      fill: rgba(196,163,90,0.92);
+      stroke: rgba(8,8,14,0.9);
+      stroke-width: 1.5;
+    }
+
+    .transform-handle.delete {
+      fill: rgba(214,96,96,0.96);
+      stroke: rgba(8,8,14,0.9);
+      stroke-width: 1.5;
+    }
+
+    .message {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      color: rgba(255,255,255,0.34);
+      font: 400 13px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      pointer-events: none;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 14px;
+      font: 400 12px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: rgba(255,255,255,0.35);
+      flex-wrap: wrap;
+    }
+
+    .stats-bar strong {
+      color: rgba(255,255,255,0.7);
+      font-weight: 600;
+    }
+
+    .upload-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .upload-trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.56);
+      font: 500 11px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .upload-trigger:hover {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.74);
+    }
+
+    .upload-name {
+      min-width: 0;
+      color: rgba(255,255,255,0.32);
+      font: 400 12px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      word-break: break-word;
+      flex: 1 1 140px;
+    }
+
+    .editor.is-focused {
+      border-color: rgba(91,168,255,0.38);
+      background: rgba(91,168,255,0.08);
+      box-shadow: 0 0 0 1px rgba(91,168,255,0.14) inset;
+    }
+
+    .editor.focus-claim {
+      animation: editor-pulse 850ms ease;
+    }
+
+    @keyframes editor-pulse {
+      0% {
+        border-color: rgba(196,163,90,0.56);
+        background: rgba(196,163,90,0.11);
+        box-shadow: 0 0 0 1px rgba(196,163,90,0.18) inset;
+      }
+      100% {
+        border-color: rgba(91,168,255,0.38);
+        background: rgba(91,168,255,0.08);
+        box-shadow: 0 0 0 1px rgba(91,168,255,0.14) inset;
+      }
+    }
+
+    @media (max-width: 1040px) {
+      html,
+      body {
+        overflow: auto;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .stage-shell {
+        position: relative;
+        top: auto;
+        height: auto;
+      }
+
+      .stage {
+        min-height: 540px;
+      }
+
+      .panel {
+        height: auto;
+        overflow: visible;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .experiment-shell {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .stage {
+        min-height: 480px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="experiment-shell">
+    <a class="back-link" href="../index.html">Back to all experiments</a>
+
+    <header class="experiment-header">
+      <h1 class="experiment-title">Text-in-Any-Shape Studio</h1>
+      <p class="experiment-subtitle">Build and edit multiple closed shapes, bind a different paragraph to each one, import SVG figures, hide guides, and export the composition as a PNG.</p>
+    </header>
+
+    <section class="workspace">
+      <aside class="panel">
+        <div class="panel-section">
+          <span class="panel-label">Shapes</span>
+          <div class="shape-list" id="shapeList"></div>
+          <div class="shape-templates" id="shapeTemplates">
+            <button class="shape-btn" data-template="heart">Add heart</button>
+            <button class="shape-btn" data-template="orb">Add orb</button>
+            <button class="shape-btn" data-template="drop">Add drop</button>
+            <button class="shape-btn" data-template="diamond">Add diamond</button>
+          </div>
+          <div class="button-row">
+            <button class="tool-btn" id="toggleShape">Hide shape</button>
+            <button class="tool-btn" id="addPointMode">Add points</button>
+            <button class="tool-btn" id="exportPng">Export PNG</button>
+          </div>
+          <div class="button-row">
+            <button class="tool-btn" id="zoomOut">Zoom out</button>
+            <button class="tool-btn" id="zoomReset">100%</button>
+            <button class="tool-btn" id="zoomIn">Zoom in</button>
+          </div>
+          <p class="hint-text">Drag a shape to move it. Drag blue points to edit it. Gold points add new vertices. Double-click any shape to focus its text.</p>
+        </div>
+
+        <div class="panel-section">
+          <span class="panel-label">Text for active shape</span>
+          <div class="mini-row" id="sampleButtons">
+            <button class="sample-btn" data-copy="Designers chase the impossible because the impossible is often just a better default waiting to be discovered. This living silhouette keeps every line readable while the container shifts under your hand.">Editorial</button>
+            <button class="sample-btn" data-copy="Words can be delicate and still feel alive. A sentence does not need a rectangle if the layout engine understands how to listen to geometry.">Minimal</button>
+            <button class="sample-btn" data-copy="AGI 春天到了. بدأت الرحلة. Typography should survive mixed scripts, long words, and unusual contours without collapsing into a gimmick.">Multilingual</button>
+          </div>
+          <textarea class="editor" id="shapeText"></textarea>
+          <label class="toggle-row">
+            <input id="noWordBreak" type="checkbox">
+            <span>Keep words unbroken</span>
+          </label>
+        </div>
+
+        <div class="panel-section">
+          <span class="panel-label">Font</span>
+          <select class="font-select" id="fontPreset">
+            <option value='Georgia, Palatino, "Times New Roman", serif'>Georgia</option>
+            <option value='"Helvetica Neue", Helvetica, Arial, sans-serif'>Helvetica Neue</option>
+            <option value='"Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif'>Iowan Old Style</option>
+            <option value='"Times New Roman", Times, serif'>Times New Roman</option>
+            <option value='Arial, Helvetica, sans-serif'>Arial</option>
+          </select>
+          <input class="font-input" id="googleFontInput" type="text" placeholder="Google Font name, e.g. Cormorant Garamond">
+          <div class="button-row">
+            <button class="tool-btn" id="loadGoogleFont">Load Google Font</button>
+          </div>
+          <div class="upload-row">
+            <label class="upload-trigger" for="fontUpload">Choose font file</label>
+            <span class="upload-name" id="fontUploadName">No file selected</span>
+          </div>
+          <input class="font-file" id="fontUpload" type="file" accept=".ttf,.otf,.woff,.woff2">
+          <div class="range-row">
+            <div class="range-group">
+              <span class="panel-label">Size</span>
+              <input id="fontSize" type="range" min="15" max="28" value="19">
+              <span class="value-display" id="fontSizeValue">19px</span>
+            </div>
+            <div class="range-group">
+              <span class="panel-label">Leading</span>
+              <input id="lineHeight" type="range" min="22" max="40" value="29">
+              <span class="value-display" id="lineHeightValue">29px</span>
+            </div>
+            <div class="range-group">
+              <span class="panel-label">Padding</span>
+              <input id="shapePadding" type="range" min="8" max="48" value="18">
+              <span class="value-display" id="shapePaddingValue">18px</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <span class="panel-label">Paste SVG</span>
+          <textarea class="svg-paste" id="svgPaste" placeholder="<svg>…closed figures…</svg>"></textarea>
+          <div class="button-row">
+            <button class="tool-btn" id="importSvg">Import closed shapes</button>
+            <button class="tool-btn" id="addBlankShape">Add blank shape</button>
+          </div>
+          <p class="hint-text">Closed paths, polygons, rects, circles, and ellipses are supported. Imported figures become independent text containers.</p>
+        </div>
+      </aside>
+
+      <section class="stage-shell">
+        <div class="stage" id="stage">
+          <div class="status" id="status">Move shapes · Drag the background to pan the canvas · Double-click a shape to edit its text</div>
+          <svg class="scene-svg" id="sceneSvg" aria-hidden="true"></svg>
+          <svg class="helper-svg" id="helperSvg" aria-hidden="true"></svg>
+          <div class="message" id="message">Preparing the studio…</div>
+        </div>
+
+        <div class="stats-bar">
+          <span>Shapes <strong id="statShapes">0</strong></span>
+          <span>Lines <strong id="statLines">0</strong></span>
+          <span>Active <strong id="statActive">none</strong></span>
+          <span>Zoom <strong id="statZoom">100%</strong></span>
+          <span>View <strong id="statView">0, 0</strong></span>
+          <span>State <strong id="statState">loading</strong></span>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./text-in-any-shape.js"></script>
+</body>
+</html>

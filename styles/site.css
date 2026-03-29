@@ -1,0 +1,193 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html,
+body {
+  min-height: 100vh;
+  background: #08080e;
+  color: #ddd8d0;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 72px 24px 56px;
+}
+
+.header {
+  text-align: center;
+  margin: 0 auto 52px;
+  max-width: 920px;
+}
+
+.logo {
+  font: 300 11px/1 "SF Mono", "Fira Code", "Consolas", monospace;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: rgba(196, 163, 90, 0.5);
+  margin-bottom: 20px;
+}
+
+.page-title {
+  font: 600 42px/1.08 Georgia, Palatino, "Times New Roman", serif;
+  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font: 400 15px/1.7 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.demos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.demo-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 144px;
+  padding: 32px 28px;
+  text-decoration: none;
+  background: #08080e;
+  transition: background 0.2s ease;
+}
+
+a.demo-card:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.demo-card.is-disabled {
+  cursor: default;
+}
+
+.demo-tag {
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 4px 7px;
+  border-radius: 4px;
+  font: 500 9px/1 "SF Mono", "Fira Code", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.tag-layout {
+  background: rgba(100, 200, 255, 0.08);
+  color: rgba(100, 200, 255, 0.6);
+}
+
+.tag-interactive {
+  background: rgba(120, 200, 120, 0.08);
+  color: rgba(120, 200, 120, 0.55);
+}
+
+.tag-motion {
+  background: rgba(196, 163, 90, 0.1);
+  color: rgba(196, 163, 90, 0.6);
+}
+
+.tag-soon {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.demo-name {
+  font: 600 17px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 8px;
+}
+
+.demo-desc {
+  font: 400 13px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.footer-link {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.footer-link--stack {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-link a,
+.back-link {
+  font: 400 13px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.2);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footer-link a:hover,
+.back-link:hover {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 26px;
+}
+
+.experiment-shell {
+  min-height: 100vh;
+  padding: 28px 18px 72px;
+}
+
+.experiment-header {
+  text-align: center;
+  margin: 0 auto 24px;
+  max-width: 640px;
+}
+
+.experiment-title {
+  font: 600 24px/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 8px;
+}
+
+.experiment-subtitle {
+  font: 400 13px/1.6 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 700px) {
+  .page-shell {
+    padding: 48px 16px 40px;
+  }
+
+  .page-title {
+    font-size: 32px;
+  }
+
+  .demos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .demo-card {
+    min-height: 108px;
+    padding: 24px 20px;
+  }
+}
