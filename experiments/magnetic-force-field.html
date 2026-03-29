@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A cursor-driven typography study where magnetic fields bend paragraph lines and let them settle back into order.">
+  <title>Magnetic Force-Field Text — Diginova Experiments</title>
+  <link rel="stylesheet" href="../styles/site.css">
+  <style>
+    html,
+    body {
+      height: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top, rgba(196, 163, 90, 0.16), transparent 26%),
+        radial-gradient(circle at 78% 18%, rgba(91, 168, 255, 0.17), transparent 22%),
+        linear-gradient(180deg, #06070b 0%, #090b11 48%, #05060a 100%);
+    }
+
+    .magnetic-shell {
+      width: min(1420px, 100%);
+      height: 100vh;
+      margin: 0 auto;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .back-link {
+      margin-bottom: 18px;
+    }
+
+    .experiment-header {
+      margin-bottom: 16px;
+      max-width: 720px;
+    }
+
+    .experiment-title {
+      font: 600 30px/1.08 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.6px;
+    }
+
+    .experiment-subtitle {
+      max-width: 620px;
+    }
+
+    .magnetic-workspace {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .magnetic-panel,
+    .magnetic-stage {
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.026);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .magnetic-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(196, 163, 90, 0.34) rgba(255, 255, 255, 0.04);
+    }
+
+    .magnetic-panel::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .magnetic-panel::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .magnetic-panel::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(196, 163, 90, 0.42), rgba(91, 168, 255, 0.32));
+      border-radius: 999px;
+      border: 2px solid rgba(9, 11, 17, 0.92);
+    }
+
+    .panel-block {
+      padding: 14px 15px 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .panel-block:first-child {
+      border-top: 0;
+    }
+
+    .panel-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(196, 163, 90, 0.08);
+      color: rgba(196, 163, 90, 0.72);
+      font: 500 10px/1 "SF Mono", "Fira Code", monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .panel-title {
+      margin-bottom: 7px;
+      color: rgba(255, 255, 255, 0.9);
+      font: 600 17px/1.16 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.2px;
+    }
+
+    .panel-copy,
+    .panel-note,
+    .metric-label {
+      color: rgba(255, 255, 255, 0.45);
+      font: 400 12px/1.45 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .clear-btn {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.64);
+      font: 500 11px/1 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .clear-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(91, 168, 255, 0.34);
+      background: rgba(91, 168, 255, 0.12);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .text-editor {
+      width: 100%;
+      min-height: 108px;
+      max-height: 108px;
+      margin-top: 12px;
+      padding: 11px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.16);
+      color: rgba(255, 255, 255, 0.9);
+      font: 400 12px/1.45 "Helvetica Neue", Helvetica, Arial, sans-serif;
+      resize: none;
+      outline: none;
+      overflow: hidden;
+    }
+
+    .text-editor:focus {
+      border-color: rgba(91, 168, 255, 0.35);
+      box-shadow: 0 0 0 1px rgba(91, 168, 255, 0.16) inset;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .field-control {
+      display: grid;
+      gap: 4px;
+    }
+
+    .field-control-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.82);
+      font: 500 11px/1.15 "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .field-control-value {
+      color: rgba(100, 200, 255, 0.82);
+      font: 500 12px/1 "SF Mono", "Fira Code", monospace;
+    }
+
+    .field-control input[type="range"] {
+      width: 100%;
+      accent-color: #72aef2;
+      margin: 0;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .metric-card {
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .metric-value {
+      margin-bottom: 4px;
+      color: rgba(255, 255, 255, 0.9);
+      font: 600 15px/1 Georgia, "Times New Roman", serif;
+      letter-spacing: -0.2px;
+    }
+
+    .panel-note {
+      margin-top: 8px;
+    }
+
+    .magnetic-stage {
+      position: relative;
+      position: sticky;
+      top: 0;
+      align-self: start;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 14% 20%, rgba(196, 163, 90, 0.09), transparent 22%),
+        radial-gradient(circle at 80% 14%, rgba(91, 168, 255, 0.12), transparent 22%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .scene-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .stage-hud {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px 22px;
+      pointer-events: none;
+    }
+
+    .stage-kicker,
+    .stage-readout {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(4, 6, 10, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.56);
+      font: 500 11px/1 "SF Mono", "Fira Code", monospace;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .stage-readout {
+      text-align: right;
+    }
+
+    .flow-line {
+      fill: #ece6dd;
+      font-family: Georgia, "Times New Roman", serif;
+      paint-order: stroke;
+      stroke: rgba(8, 8, 14, 0.3);
+      stroke-width: 0.5px;
+      letter-spacing: 0;
+    }
+
+    .flow-line.is-muted {
+      fill: rgba(236, 230, 221, 0.62);
+    }
+
+    .guide-column {
+      fill: rgba(255, 255, 255, 0.02);
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-dasharray: 9 12;
+    }
+
+    .guide-baseline {
+      stroke: rgba(255, 255, 255, 0.045);
+      stroke-width: 1;
+    }
+
+    .field-core {
+      fill: rgba(91, 168, 255, 0.11);
+      stroke: rgba(150, 204, 255, 0.38);
+      stroke-width: 1;
+    }
+
+    .field-ring {
+      fill: none;
+      stroke: rgba(150, 204, 255, 0.2);
+      stroke-width: 1;
+    }
+
+    .field-ring.echo {
+      stroke: rgba(196, 163, 90, 0.18);
+    }
+
+    .field-vector {
+      stroke: rgba(196, 163, 90, 0.22);
+      stroke-width: 1;
+      stroke-dasharray: 4 8;
+    }
+
+    .field-dot {
+      fill: rgba(255, 255, 255, 0.78);
+    }
+
+    .ghost-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .magnetic-shell {
+        height: auto;
+        overflow: visible;
+      }
+
+      .magnetic-workspace {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .magnetic-panel {
+        display: flex;
+        overflow: visible;
+      }
+
+      .magnetic-stage {
+        min-height: 70vh;
+        height: 70vh;
+        position: relative;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .magnetic-shell {
+        padding-top: 10px;
+      }
+
+      .experiment-title {
+        font-size: 25px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stage-hud {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .stage-hud {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .text-editor {
+        max-height: 132px;
+      }
+    }
+
+    @media (max-height: 860px) and (min-width: 981px) {
+      .panel-block {
+        padding: 12px 13px 13px;
+      }
+
+      .text-editor {
+        min-height: 92px;
+        max-height: 92px;
+      }
+
+      .panel-copy,
+      .panel-note,
+      .metric-label {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="experiment-shell magnetic-shell">
+    <a class="back-link" href="../index.html">Back to all experiments</a>
+
+    <header class="experiment-header">
+      <h1 class="experiment-title">Magnetic Force-Field Text</h1>
+      <p class="experiment-subtitle">Tune the motion curve and let the paragraph bend around the field without breaking reading flow.</p>
+    </header>
+
+    <section class="magnetic-workspace">
+      <aside class="magnetic-panel">
+        <div class="panel-block">
+          <div class="panel-kicker">Experiment 03</div>
+          <h2 class="panel-title">Controls</h2>
+        </div>
+
+        <div class="panel-block">
+          <div class="preset-row">
+            <button class="clear-btn" id="resetMotion">Reset motion</button>
+          </div>
+
+          <div class="field-grid">
+            <label class="field-control">
+              <span class="field-control-head">
+                <span>Field radius</span>
+                <span class="field-control-value" id="radiusValue">168 px</span>
+              </span>
+              <input id="radiusInput" type="range" min="96" max="260" step="1" value="168">
+            </label>
+
+            <label class="field-control">
+              <span class="field-control-head">
+                <span>Pull strength</span>
+                <span class="field-control-value" id="strengthValue">0.92</span>
+              </span>
+              <input id="strengthInput" type="range" min="0.35" max="1.4" step="0.01" value="0.92">
+            </label>
+
+            <label class="field-control">
+              <span class="field-control-head">
+                <span>Settle speed</span>
+                <span class="field-control-value" id="settleValue">0.12</span>
+              </span>
+              <input id="settleInput" type="range" min="0.04" max="0.22" step="0.01" value="0.12">
+            </label>
+
+            <label class="field-control">
+              <span class="field-control-head">
+                <span>Echo fields</span>
+                <span class="field-control-value" id="echoValue">2</span>
+              </span>
+              <input id="echoInput" type="range" min="0" max="3" step="1" value="2">
+            </label>
+          </div>
+
+          <textarea class="text-editor" id="textInput" aria-label="Paragraph text"></textarea>
+        </div>
+
+        <div class="panel-block">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value" id="lineCount">0</div>
+              <div class="metric-label">active lines</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="fieldCount">0</div>
+              <div class="metric-label">live fields</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="maxShift">0 px</div>
+              <div class="metric-label">largest sideways drift</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="columnWidth">0 px</div>
+              <div class="metric-label">base reading width</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="magnetic-stage" id="stage" aria-label="Magnetic text field">
+        <svg class="scene-svg" id="sceneSvg" aria-hidden="true"></svg>
+
+        <div class="stage-hud">
+          <div class="stage-kicker">Move through the reading column</div>
+          <div class="stage-readout" id="hudReadout">1 field / 0 px shift</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="./magnetic-force-field.js"></script>
+</body>
+</html>
